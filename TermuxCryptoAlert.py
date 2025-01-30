@@ -2,7 +2,7 @@ import json
 import os
 import subprocess
 import requests
-import time                                                              
+import time
 import threading
 import sys
 import signal
@@ -22,7 +22,8 @@ class TermuxCryptoGUI:
                     return json.load(f)
             except json.JSONDecodeError:
                 return []
-        return []                                                          
+        return []
+
     def save_alerts(self):
         """Save alerts to config file."""
         with open(self.config_file, 'w') as f:
@@ -31,10 +32,10 @@ class TermuxCryptoGUI:
     def show_menu(self) -> str:
         """Show main menu using termux-dialog radio."""
         try:
-            menu_options = ["➕ Add Alert", "🗑️ Remove Alert", "📋 List Alerts", "🚀 Start Monitoring", "⏹️ Stop Monitoring", "❌ Exit"]
+            menu_options = ["➕ Add Alert", "🗑️ Remove Alert", "📋 List Alerts", "🚀 Start Monitoring", "⏹️ Stop Monitoring", "ℹ️ App Info", "❌ Exit"]
             result = subprocess.run([
                 "termux-dialog", "radio",
-                "-t", "Crypto Alert Manager",
+                "-t", "Termux-Crypto-Alert",  # Changed title here
                 "-v", ",".join(menu_options)
             ], capture_output=True, text=True)
 
@@ -248,7 +249,7 @@ class TermuxCryptoGUI:
 
     def monitor_alerts(self):
         """Monitor cryptocurrency prices and trigger alerts."""
-        self.show_toast("🚀 Starting price monitoring in background (less robust)...")
+        self.show_toast("🚀 Starting price monitoring in background...")
         print(f"DEBUG: Monitoring process started.")
 
         try:
@@ -285,7 +286,7 @@ class TermuxCryptoGUI:
             pid = process.pid
             with open(self.pid_file, "w") as f:
                 f.write(str(pid))
-            self.show_toast("🚀 Monitoring started in background (less robust)")
+            self.show_toast("🚀 Monitoring started in background")
             print(f"DEBUG: Background monitoring started with PID: {pid}. PID saved to '{self.pid_file}'.")
         except Exception as e:
             self.show_toast(f"Error starting monitoring: {e}")
@@ -332,6 +333,23 @@ class TermuxCryptoGUI:
             self.show_toast("Monitoring is not running.")
             print(f"DEBUG: Monitoring is not running (PID file '{self.pid_file}' not found).")
 
+    def show_app_info(self):
+        """Show application info and contact details."""
+        app_info_text = """
+Termux-Crypto-Alert
+
+App for managing crypto
+price alerts in Termux
+
+Facebook: @SRX003
+Telegram: @SRX03
+"""
+        subprocess.run([
+            "termux-dialog", "text",
+            "-t", "ℹ️ App Info",
+            "-i", app_info_text.strip() # Use strip to remove leading/trailing whitespace for cleaner look
+        ])
+
 
 def main():
     app = TermuxCryptoGUI()
@@ -352,6 +370,8 @@ def main():
                 app.show_toast("Monitoring is already running. Stop it first to restart.")
         elif choice == "⏹️ Stop Monitoring":
             app.stop_monitoring()
+        elif choice == "ℹ️ App Info": # Added this condition
+            app.show_app_info()      # Call the new function
         elif choice == "❌ Exit":
             break
 
