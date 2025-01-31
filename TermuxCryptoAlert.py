@@ -114,7 +114,7 @@ class TermuxCryptoGUI:
 
                 if not sound_files:
                     self.show_toast("No sound files found in script directory. Using default alert.")
-                    subprocess.run(["mpv", "/data/data/com.termux/files/home/storage/shared/Download/alertcoin.mp3"], check=True) # Fallback to default
+                    subprocess.run(["mpv", "/data/data/com.termux/files/home/Termux-Crypto-Alert/alertcoin.mp3"], check=True) # Fallback to default
                     return
 
                 result = subprocess.run([
@@ -134,7 +134,7 @@ class TermuxCryptoGUI:
                             self.show_toast(f"Error: Selected sound file not found: {sound_path}")
                     else:
                         self.show_toast("No sound file selected. Using default alert.")
-                        subprocess.run(["mpv", "/data/data/com.termux/files/home/storage/shared/Download/alertcoin.mp3"], check=True) # Fallback to default
+                        subprocess.run(["mpv", "/data/data/com.termux/files/home/Termux-Crypto-Alert/alertcoin.mp3"], check=True) # Fallback to default
                 else:
                     self.show_toast(f"Error running termux-dialog sheet: {result.stderr.decode()}")
 
