@@ -155,7 +155,7 @@ class TermuxCryptoGUI:
 
     def add_alert(self):
         """Add new alert through GUI."""
-        coin = self.get_input("Enter cryptocurrency name (e.g., bitcoin):")
+        coin = self.get_input("Enter cryptocurrency name(ID) (e.g., bitcoin, ethereum, book-of-meme):")
         if not coin:
             return
 
