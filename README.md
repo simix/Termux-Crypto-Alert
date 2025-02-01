@@ -51,6 +51,38 @@ A graphical user interface (GUI) Python script for Termux to manage cryptocurren
 ### NOTE:
  **Sound Files : If you want to use custom alert sounds, place `.mp3`, `.wav`, `.flac`, or `.ogg` sound files             in the same directory as the script. Otherwise, you can enter the full path to a sound file located anywhere             on your device when prompted to select a sound.**
 
+## Finding the CoinGecko Coin ID
+
+To add an alert for a specific cryptocurrency, you need to use its **CoinGecko Coin ID**.  This ID is used by the script to fetch price data from the CoinGecko API. Here's how to find it:
+
+1.  **Go to the CoinGecko Website:** Open your web browser and navigate to [https://www.coingecko.com](https://www.coingecko.com).
+
+2.  **Search for Your Cryptocurrency:** Use the search bar at the top of the CoinGecko website to find the cryptocurrency you want to set an alert for (e.g., Bitcoin, Ethereum, Dogecoin, BOME).
+
+3.  **Click on the Cryptocurrency:** Once you find your cryptocurrency in the search results, click on its name or symbol to go to its dedicated page on CoinGecko.
+
+4.  **Copy the Coin ID from the URL:** Look at the URL (web address) of the cryptocurrency's page in your browser's address bar.  The CoinGecko Coin ID is usually the **last part of the URL path**.
+
+    For example, if you navigate to Bitcoin's page on CoinGecko, the URL might look something like:
+
+    `https://www.coingecko.com/en/coins/bitcoin`
+
+    In this example, the CoinGecko Coin ID is **`bitcoin`**.
+
+    Another example, for BOOK OF MEME (BOME), the URL might be:
+
+    `https://www.coingecko.com/en/coins/book-of-meme`
+
+    Here, the CoinGecko Coin ID is **`book-of-meme`** (or often shortened to just **`bome`** in the API, as used by this script).
+
+5.  **Use the Coin ID in the Script:** When the script prompts you to "Enter cryptocurrency name", use the CoinGecko Coin ID you copied from the URL.
+
+**Important Notes:**
+
+*   CoinGecko Coin IDs are usually in **lowercase** and often a **single word** (or hyphenated words).
+*   Make sure you are copying the ID from the **correct cryptocurrency page** on CoinGecko.
+*   If you are unsure, you can always test with a well-known cryptocurrency like `bitcoin` or `ethereum` first.
+
 ## _________________________________________________________________________________
 
 
@@ -75,13 +107,13 @@ A graphical user interface (GUI) Python script for Termux to manage cryptocurren
     python TermuxCryptoAlert.py
     ```
     This command will launch the **graphical user interface** menu using `termux-dialog`.
-    
+
     ![Screenshot_20250130_233408](https://github.com/user-attachments/assets/a181dc21-e225-41c1-8203-f4560512abb3)
 
 
 3.  **Navigate the Menu:** tap on the options within the Termux dialog to navigate the menu.
 
-    *   **➕ Add Alert:**  Select to create a new alert. Follow the prompts in the dialogs to enter cryptocurrency name, price threshold, condition, and optionally select a custom sound.
+    *   **➕ Add Alert:**  Select to create a new alert. Follow the prompts in the dialogs to enter cryptocurrency name, price threshold, condition, and optionally select a custom sound. **Remember to use the CoinGecko Coin ID for the cryptocurrency name (see section above).**
 
     *   **🗑️ Remove Alert:**  Select to remove an existing alert. Choose the alert to remove from the list presented in the dialog.
 
