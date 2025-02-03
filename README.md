@@ -1,17 +1,21 @@
 # Termux Crypto Alert - GUI
 
-A graphical user interface (GUI) Python script for Termux to manage cryptocurrency price alerts and receive notifications directly on your Android device. This script utilizes Termux dialogs for a user-friendly menu interface within your Termux environment.
+A graphical user interface (GUI) Python script for Termux to manage cryptocurrency price alerts and receive notifications directly on your Android device. This script utilizes Termux dialogs for a user-friendly menu interface within your Termux environment, **using the KuCoin API for price data.**
 
 ## Features
 
 *   **Graphical User Interface (GUI):**  Interactive menu-driven interface using Termux dialogs for easy navigation and alert management.
-*   **Add Alerts:** Easily add new cryptocurrency price alerts with customizable conditions (above or below a threshold) and target prices in USD.
+*   **Add Alerts:** Easily add new cryptocurrency price alerts with customizable conditions (above or below a threshold) and target prices in your chosen quote currency (e.g., USDT).
 *   **Remove Alerts:** Delete existing alerts when they are no longer needed.
-*   **List Alerts:** View all currently active alerts with their details.
-*   **Start Monitoring:** Initiate price monitoring in the background to continuously check for alert conditions.
+*   **List Alerts:** View all currently active alerts with their details and real-time status.
+*   **Restart Monitoring:**  Initiate or restart price monitoring in the background to continuously check for alert conditions.
 *   **Stop Monitoring:** Halt the background monitoring process.
 *   **Custom Alert Sounds:** Option to select custom sound files for alerts from the script's directory. Default sound is also included.
 *   **Termux Notifications:** Receive instant notifications when an alert condition is triggered.
+*   **Price History:** View and share price history charts for your alerts, helping you analyze price movements.
+*   **Backtest Alert:** Simulate alert triggers over historical data to evaluate alert effectiveness.
+*   **Settings:** Customize script settings such as check interval and price history duration.
+*   **Export/Import Alerts:** Save your alerts to a JSON file for backup or sharing, and import them back when needed.
 *   **App Info:** Access application information and contact details within the script's menu.
 
 ## Requirements
@@ -39,6 +43,10 @@ A graphical user interface (GUI) Python script for Termux to manage cryptocurren
         ```bash
         pkg install mpv
         ```
+    *   **Matplotlib (Optional):** For price history charts. Install if you want to use the "Price History" feature.
+        ```bash
+        pip install matplotlib
+        ```
 
 4.  **Python Libraries:** Install required Python libraries using `pip`
     *   Ensure you have `pip` installed for Python in Termux
@@ -49,39 +57,22 @@ A graphical user interface (GUI) Python script for Termux to manage cryptocurren
     ```
 
 ### NOTE:
- **Sound Files : If you want to use custom alert sounds, place `.mp3`, `.wav`, `.flac`, or `.ogg` sound files             in the same directory as the script. Otherwise, you can enter the full path to a sound file located anywhere             on your device when prompted to select a sound.**
+ **Sound Files : If you want to use custom alert sounds, place `.mp3`, `.wav`, `.flac`, or `.ogg` sound files in the same directory as the script.**
 
-## Finding the CoinGecko Coin ID
+## Finding the Trading Pair Symbol (KuCoin)
 
-To add an alert for a specific cryptocurrency, you need to use its **CoinGecko Coin ID**.  This ID is used by the script to fetch price data from the CoinGecko API. Here's how to find it:
+To add an alert, you need the **KuCoin trading pair symbol** (e.g., BTC-USDT). This symbol is used to fetch price data from KuCoin.
 
-1.  **Go to the CoinGecko Website:** Open your web browser and navigate to [https://www.coingecko.com](https://www.coingecko.com).
-
-2.  **Search for Your Cryptocurrency:** Use the search bar at the top of the CoinGecko website to find the cryptocurrency you want to set an alert for (e.g., Bitcoin, Ethereum, Dogecoin, BOME).
-
-3.  **Click on the Cryptocurrency:** Once you find your cryptocurrency in the search results, click on its name or symbol to go to its dedicated page on CoinGecko.
-
-4.  **Copy the Coin ID from the URL:** Look at the URL (web address) of the cryptocurrency's page in your browser's address bar.  The CoinGecko Coin ID is usually the **last part of the URL path**.
-
-    For example, if you navigate to Bitcoin's page on CoinGecko, the URL might look something like:
-
-    `https://www.coingecko.com/en/coins/bitcoin`
-
-    In this example, the CoinGecko Coin ID is **`bitcoin`**.
-
-    Another example, for BOOK OF MEME (BOME), the URL might be:
-
-    `https://www.coingecko.com/en/coins/book-of-meme`
-
-    Here, the CoinGecko Coin ID is **`book-of-meme`** (or often shortened to just **`bome`** in the API, as used by this script).
-
-5.  **Use the Coin ID in the Script:** When the script prompts you to "Enter cryptocurrency name", use the CoinGecko Coin ID you copied from the URL.
+1.  **Go to KuCoin:** Open the KuCoin website or app.
+2.  **Search for Pair:** Search for the cryptocurrency pair you want (e.g., "BTCUSDT").
+3.  **Find Symbol:** The trading pair symbol (e.g., `BTC-USDT`) is on the trading page.
+4.  **Use in Script:** Enter this symbol when adding an alert in the script.
 
 **Important Notes:**
 
-*   CoinGecko Coin IDs are usually in **lowercase** and often a **single word** (or hyphenated words).
-*   Make sure you are copying the ID from the **correct cryptocurrency page** on CoinGecko.
-*   If you are unsure, you can always test with a well-known cryptocurrency like `bitcoin` or `ethereum` first.
+*   Use **uppercase** symbols with a hyphen (e.g., `BTC-USDT`).
+*   Ensure it's the **correct trading pair** from KuCoin.
+*   Common quote currencies are USDT, BTC, and ETH.
 
 ## _________________________________________________________________________________
 
@@ -89,13 +80,12 @@ To add an alert for a specific cryptocurrency, you need to use its **CoinGecko C
 ## Installation
 
 1.  **Clone the repository (or download the script):**
-    If you are using Git in Termux:
     ```bash
     git clone https://github.com/simix/Termux-Crypto-Alert.git
     cd Termux-Crypto-Alert
     ```
 
-3.  **Make the script executable:**
+2.  **Make the script executable:**
     ```bash
     chmod +x TermuxCryptoAlert.py
     ```
@@ -106,36 +96,36 @@ To add an alert for a specific cryptocurrency, you need to use its **CoinGecko C
     ```bash
     python TermuxCryptoAlert.py
     ```
-    This command will launch the **graphical user interface** menu using `termux-dialog`.
+    This launches the menu.
 
-    ![Screenshot_20250130_233408](https://github.com/user-attachments/assets/a181dc21-e225-41c1-8203-f4560512abb3)
+    ![Screenshot_20250203_101850](https://github.com/user-attachments/assets/e2ab3b75-dad0-4b29-adfb-f279eded21bb)
 
 
-3.  **Navigate the Menu:** tap on the options within the Termux dialog to navigate the menu.
 
-    *   **➕ Add Alert:**  Select to create a new alert. Follow the prompts in the dialogs to enter cryptocurrency name, price threshold, condition, and optionally select a custom sound. **Remember to use the CoinGecko Coin ID for the cryptocurrency name (see section above).**
+2.  **Navigate the Menu:** Tap options in the dialog:
 
-    *   **🗑️ Remove Alert:**  Select to remove an existing alert. Choose the alert to remove from the list presented in the dialog.
-
-    *   **📋 List Alerts:**  Select to display a dialog box listing all active alerts and their details.
-
-    *   **🚀 Start Monitoring:** Select to start the background price monitoring. You will receive a toast notification indicating it has started.
-
-    *   **⏹️ Stop Monitoring:** Select to stop the background price monitoring. You will receive a toast notification confirming it has stopped.
-
-    *   **ℹ️ App Info:** Select to view application information and contact details in a dialog box.
-
-    *   **❌ Exit:** Select to close the script and exit the menu.
+    *   **➕ Add Alert:** Create a new alert. Enter the KuCoin trading pair (e.g., BTC-USDT), price, condition, and optional sound.
+    *   **🗑️ Remove Alert:** Delete an alert.
+    *   **📋 List Alerts:** View all alerts and their status.
+    *   **🔄 Restart Monitoring:** Start/restart background monitoring.
+    *   **⏹️ Stop Monitoring:** Stop background monitoring.
+    *   **📈 Price History:** View and share price chart for an alert.
+    *   **📊 Backtest Alert:** Simulate past triggers for an alert.
+    *   **⚙️ Settings:** Configure check interval and history days.
+    *   **📤 Export Alerts:** Export alerts to a JSON file.
+    *   **📥 Import Alerts:** Import alerts from a JSON file.
+    *   **ℹ️ App Info:** Show app information.
+    *   **❌ Exit:** Close the script.
 
 ## Background Monitoring Notes
 
-*   When "🚀 Start Monitoring" is selected, the script initiates a background process to monitor prices.
-*   Always use "⏹️ Stop Monitoring" from the menu to properly halt the background process. Closing the Termux session might not immediately stop it.
-*   Be aware of Android and Termux background execution limitations, which might affect long-term reliability of background monitoring, especially on devices with aggressive battery optimization.
+*   "🔄 Restart Monitoring" starts background; use after adding alerts.
+*   Use "⏹️ Stop Monitoring" to halt it properly.
 
 ## Customization
 
-*   **Alert Sounds:** Place custom sound files (`.mp3`, `.wav`, `.flac`, `.ogg`) in the same directory as `TermuxCryptoAlert.py`. The script will detect these and allow you to choose them when adding alerts.
+*   **Alert Sounds:** Place sound files (`.mp3`, `.wav`, `.flac`, `.ogg`) in the script's directory.
+*   **Settings:** Use "⚙️ Settings" to adjust `check_interval` and `max_history_days`.
 
 ## Contact
 
@@ -144,8 +134,8 @@ To add an alert for a specific cryptocurrency, you need to use its **CoinGecko C
 
 ## License
 
-This script is open for personal use and modification. Feel free to use and adapt it as needed.
+Personal use and modification are allowed.
 
 ---
 
-**Enjoy managing your crypto alerts with the Termux Crypto Alert Manager GUI!**
+**Enjoy Termux Crypto Alert GUI!**
