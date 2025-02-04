@@ -12,24 +12,26 @@ import matplotlib.pyplot as plt  # Make sure to install matplotlib: pip install 
 class TermuxCryptoGUI:
     def __init__(self):
         self.config_file = os.path.expanduser("~/.crypto_alerts.json")
-        self.alerts = self.load_alerts()
+        self.alerts = []  # Initialize as empty list, will load quickly
         self.triggered_alerts = [] # Holds alerts triggered in the current check interval
         self.currently_alerting = set() # Track alerts currently in alerting state to repeat notifications
         self.settings = {
-            "check_interval": 30,
-            "max_history_days": 7
+            "check_interval": 30,                                                                           "max_history_days": 7
         }
         self.pid_file = "crypto_monitor.pid"
+        self.load_alerts_thread = threading.Thread(target=self.load_alerts, daemon=True) # Load alerts asynchronously
+        self.load_alerts_thread.start()
 
     def load_alerts(self) -> List[Dict]:
         """Load saved alerts from config file."""
         if os.path.exists(self.config_file):
             try:
                 with open(self.config_file, 'r') as f:
-                    return json.load(f)
+                    self.alerts = json.load(f)
             except json.JSONDecodeError:
-                return []
-        return []
+                self.alerts = []                                                                        else:
+            self.alerts = []
+        return self.alerts # return loaded alerts, though they're also in self.alerts.
 
     def save_alerts(self):
         """Save alerts to config file."""
@@ -106,7 +108,7 @@ class TermuxCryptoGUI:
         """Fetch current price for a cryptocurrency trading pair from KuCoin."""
         url = f"https://api.kucoin.com/api/v1/market/orderbook/level1?symbol={symbol}"
         try:
-            response = requests.get(url)
+            response = requests.get(url, timeout=5)  # Add timeout to prevent indefinite hanging
             response.raise_for_status()
             data = response.json()
 
@@ -122,6 +124,9 @@ class TermuxCryptoGUI:
             return None
         except KeyError as e:
             self.show_toast(f"Invalid response format for {symbol}: {e}")
+            return None
+        except requests.exceptions.RequestException as e: #Catch Timeout errors as well as other connection issues.
+            self.show_toast(f"Network error fetching price for {symbol}: {e}")
             return None
         except Exception as e:
             self.show_toast(f"Error fetching price for {symbol}: {e}")
@@ -243,6 +248,12 @@ class TermuxCryptoGUI:
 
     def list_alerts(self):
         """Interactive alert list with real-time data"""
+        # Wait for alerts to load, but with a timeout to avoid blocking indefinitely.
+        self.load_alerts_thread.join(timeout=2)  # Adjust timeout as needed
+        if not self.alerts and self.load_alerts_thread.is_alive():
+           self.show_toast("Alerts loading. Please try again in a moment.")
+           return
+
         if not self.alerts:
             self.show_toast("No active alerts")
             return
@@ -281,14 +292,15 @@ class TermuxCryptoGUI:
             self.show_toast("❌ Invalid selection")
 
     def get_alert_status(self, alert):
-        """Return emoji status with current price"""
+        """Return emoji status based on condition, ❓ if price can't be fetched"""
         price = self.get_crypto_price(alert["symbol"])
-        if not price:
-            return "❔"
+        if price is None:  # Check if price could be fetched at all
+            return "❓"
 
         if alert["condition"] == "above":
-            return "�" if price > alert["price"] else "🔴"
-        return "�" if price < alert["price"] else "🔴"
+            return "�"  # Always green if condition is "above"
+        else:  # alert["condition"] == "below"
+            return "🔴"  # Always red if condition is "below"
 
     def show_sheet_dialog(self, title: str, options: List[str]) -> Optional[str]:
         """Show sheet dialog and return selected option."""
@@ -340,7 +352,7 @@ class TermuxCryptoGUI:
         url = (f"https://api.kucoin.com/api/v1/market/candles?"
                f"symbol={alert['symbol']}&type=1day&startAt={int(time.time()) - (days * 86400)}")
         try:
-            data = requests.get(url).json()["data"]
+            data = requests.get(url, timeout=10).json()["data"] # Add timeout
             prices = [float(candle[2]) for candle in data]  # Closing prices
             plt.figure(figsize=(8, 4))
             plt.plot(prices)
@@ -360,7 +372,7 @@ class TermuxCryptoGUI:
                f"symbol={alert['symbol']}&type=1hour&startAt={int(time.time()) - (days * 86400)}")
         triggers = 0
         try:
-            data = requests.get(url).json()["data"]
+            data = requests.get(url, timeout=10).json()["data"] # add timeout
             for candle in data:
                 price = float(candle[2])
                 if (alert["condition"] == "above" and price > alert["price"]) or \
@@ -544,7 +556,7 @@ class TermuxCryptoGUI:
 
         triggers = 0
         try:
-            data = requests.get(url).json()["data"]
+            data = requests.get(url, timeout=10).json()["data"] # Add timeout
             for candle in data:
                 price = float(candle[2])
                 if (alert["condition"] == "above" and price > alert["price"]) or \
@@ -569,7 +581,7 @@ class TermuxCryptoGUI:
                f"symbol={alert['symbol']}&type=1day&startAt={int(time.time()) - (days * 86400)}")
 
         try:
-            data = requests.get(url).json()["data"]
+            data = requests.get(url, timeout=10).json()["data"] # Add timeout
             prices = [float(candle[2]) for candle in data]  # Closing prices
             plt.figure(figsize=(8, 4))
             plt.plot(prices)
